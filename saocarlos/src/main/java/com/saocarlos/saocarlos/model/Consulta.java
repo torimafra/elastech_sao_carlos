@@ -3,6 +3,7 @@ package com.saocarlos.saocarlos.model;
 import jakarta.persistence.*;
 import java.time.*;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.saocarlos.saocarlos.model.enums.StatusConsulta;
 
 @Entity
@@ -15,9 +16,11 @@ public class Consulta {
     private Long id;
 
     @Column(name = "data_consulta", nullable = false)
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataConsulta;
 
     @Column(name = "hora_consulta", nullable = false)
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime horaConsulta;
 
     @Enumerated(EnumType.STRING)

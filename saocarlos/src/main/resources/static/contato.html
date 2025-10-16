@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Contato - Hospital São Carlos</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/script.js" defer></script>
+</head>
+<body>
+  <div class="top-bar">
+    <span>Agendamento de consultas: (11) 1234-5678</span>
+    <span class="social-links">
+      Siga as nossas redes sociais:
+      <a href="#"><img src="img/instagram-icon.png" alt="Instagram"></a>
+      <a href="#"><img src="img/facebook-icon.png" alt="Facebook"></a>
+      <a href="#"><img src="img/email-icon.png" alt="Email"></a>
+    </span>
+  </div>
+
+  <header class="nav-bar">
+    <div class="logo-container">
+      <img src="img/logotipo.png" alt="Logo Hospital São Carlos" class="hospital-logo">
+      <div class="hospital-name-text">
+        SÃO CARLOS
+        <span>HOSPITAL & ATENDIMENTO MÉDICO</span>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="home.html" class="nav-link">HOME</a></li>
+        <li><a href="medicos.html" class="nav-link">MÉDICOS</a></li>
+        <li><a href="pacientes.html" class="nav-link">PACIENTES</a></li>
+        <li><a href="consultas.html" class="nav-link">CONSULTAS</a></li>
+        <li><a href="contato.html" class="nav-link">CONTATOS</a></li>
+        <li><a href="index.html" onclick="logout()" class="nav-link sair-btn">SAIR</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="contato-main">
+    <section class="contato-info">
+      <h2>Informações de contato:</h2>
+      <p><strong>Endereço:</strong> Av. Paulista, 1000 - Bela Vista, São Paulo - SP 01310-100</p>
+      <p><strong>Telefone:</strong> (11) 1234-5678</p>
+      <p><strong>E-mail:</strong> atendimento@hospitalsaocarlos.com.br</p>
+    </section>
+
+    <section class="contato-info-sobre-hospital">
+      <h2>Sobre o Hospital</h2>
+      <p>
+        O Hospital São Carlos oferece atendimento médico de excelência, com uma equipe
+        multidisciplinar e infraestrutura moderna. Nosso compromisso é com o cuidado
+        integral da saúde e bem-estar de nossos pacientes.
+      </p>
+    </section>
+
+    <section class="contato-info-localizacao">
+      <h2>Localização</h2>
+      <div class="mapa-container">
+        <div class="mapa-iframe-wrapper">
+             <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3656.158927843794!2d-46.65641948450915!3d-23.597231684664675!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59ca3e244a45%3A0x9d93b364eae93b57!2sAv.%20Paulista%2C%201000%20-%20Bela%20Vista%2C%20São%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1615407205078!5m2!1spt-BR!2sbr" 
+                width="100%" height="400" style="border:0;" allowfullscreen="" loading="lazy">
+             </iframe>
+        </div>
+        
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 - Todos os direitos reservados.</p>
+    <p style="font-style: italic; font-size: small;">Projeto desenvolvido por Anajara Lucas, Camila Rodrigues, Fernanda Bastos, Juliana Chang e Victoria Li.</p>
+  </footer>
+</body>
+</html>

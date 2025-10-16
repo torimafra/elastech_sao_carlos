@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - Hospital São Carlos</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="top-bar">
+    <span>Agendamento de consultas: (11) 1234-5678</span>
+    <span class="social-links">
+      Siga as nossas redes sociais:
+      <a href="#"><img src="img/instagram-icon.png" alt="Instagram"></a>
+      <a href="#"><img src="img/facebook-icon.png" alt="Facebook"></a>
+      <a href="#"><img src="img/email-icon.png" alt="Email"></a>
+    </span>
+  </div>
+
+  <header class="nav-bar">
+    <div class="logo-container">
+      <img src="img/logotipo.png" alt="Logo Hospital São Carlos" class="hospital-logo">
+      <div class="hospital-name-text">
+        SÃO CARLOS
+        <span>HOSPITAL & ATENDIMENTO MÉDICO</span>
+      </div>
+    </div>
+    <nav class="main-nav">
+      <ul>
+        <li><a href="home.html" class="nav-link">HOME</a></li>
+        <li><a href="medicos.html" class="nav-link">MÉDICOS</a></li>
+        <li><a href="pacientes.html" class="nav-link">PACIENTES</a></li>
+        <li><a href="consultas.html" class="nav-link">CONSULTAS</a></li>
+        <li><a href="contato.html" class="nav-link">CONTATOS</a></li>
+        <li><a href="index.html" onclick="logout()" class="nav-link sair-btn">SAIR</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <br>
+
+  <div class="login-wrapper">
+    <div class="login-box">
+      <h2>FAÇA SEU LOGIN</h2>
+      <label for="login">Digite o seu Login:</label>
+      <input type="text" id="login" placeholder="Digite o seu Login">
+      
+      <label for="senha">Digite a sua senha:</label>
+      <input type="password" id="senha" placeholder="Digite a sua senha">
+      
+      <hr>
+      <button onclick="login()">ENTRAR</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 - Todos os direitos reservados.</p>
+    <p style="font-style: italic; font-size: small;">Projeto desenvolvido por Anajara Lucas, Camila Rodrigues, Fernanda Bastos, Juliana Chang e Victoria Li.</p>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
