@@ -13,7 +13,6 @@ import com.saocarlos.saocarlos.service.MedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -121,10 +120,10 @@ public class ConsultaController {
 			}
 			
 			if (!consultaDTO.getNomeMedico().equals(consultaAtual.getMedico().getNomeMedico())) {
-				Optional<Medico> registroMedico = medicoService.buscarPorNome(consultaDTO.getNomeMedico());
+				List<Medico> registroMedico = medicoService.buscarPorNome(consultaDTO.getNomeMedico());
 				if (registroMedico.isEmpty())
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo médico não encontrado"));
-				Medico novoMedico = registroMedico.get();
+				Medico novoMedico = medicoService.encontrarNomeNaLista(registroMedico, consultaDTO.getNomeMedico());
 				System.out.println("MEDICO NOVO: " + novoMedico.getNomeMedico());
 				consultaUpdate.setMedico(novoMedico);
 			} else {
@@ -161,5 +160,23 @@ public class ConsultaController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletarConsulta(@PathVariable Long id) {
+        try {
+            Optional<Consulta> consulta = consultaRepo.findById(id);
+            if (consulta.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("erro", "Consulta não encontrada"));
+            }
+
+            consultaRepo.deleteById(id);
+            return ResponseEntity.ok(Map.of("mensagem", "Consulta deletada com sucesso!"));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("erro", "Erro ao deletar consulta: " + e.getMessage()));
+        }
+   }
 }
 

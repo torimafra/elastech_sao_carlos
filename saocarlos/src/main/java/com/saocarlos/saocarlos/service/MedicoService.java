@@ -14,16 +14,26 @@ public class MedicoService {
 	@Autowired
 	private MedicoRepo repository;
 	
+	public Medico encontrarNomeNaLista(List<Medico> lista, String nome) {
+		
+		for (int i = 0; i < lista.size(); i++) {
+			if (lista.get(i).getNomeMedico().equalsIgnoreCase(nome)) {
+				return lista.get(i);
+			}
+		}
+		return null;
+	}
+	
 	// Checa se já existe registro com mesmo nome e especialidade
 	// Se houver, retorna exceção
 	// Se não, cria registro
 	public Medico salvar(Medico medico) {
 		
-		Optional<Medico> registroBanco = buscarPorNome(medico.getNomeMedico());
+		List<Medico> registroBanco = buscarPorNome(medico.getNomeMedico());
 		
-		if (registroBanco.isPresent()) {
+		if (!registroBanco.isEmpty()) {
 			
-			Medico medicoRegistrado = registroBanco.get();
+			Medico medicoRegistrado = encontrarNomeNaLista(registroBanco, medico.getNomeMedico());
 			
 			if (medicoRegistrado.getEspecialidade().equals(medico.getEspecialidade())) {
 				
@@ -72,7 +82,7 @@ public class MedicoService {
 	}
 	
 	
-	public Optional<Medico> buscarPorNome(String nome_medico) {
+	public List<Medico> buscarPorNome(String nome_medico) {
 		return repository.findByNomeMedicoContainingIgnoreCase(nome_medico);
 	}
 	

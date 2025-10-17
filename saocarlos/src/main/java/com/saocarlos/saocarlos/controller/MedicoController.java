@@ -35,7 +35,7 @@ public class MedicoController {
 		
 		try {
 			
-			Optional<Medico> medico = medicoService.buscarPorNome(nome_medico);
+			List<Medico> medico = medicoService.buscarPorNome(nome_medico);
 			return ResponseEntity.status(HttpStatus.OK).body(medico);
 			
 		} catch (IllegalArgumentException err) {

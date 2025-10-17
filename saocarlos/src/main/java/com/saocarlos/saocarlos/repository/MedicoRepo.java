@@ -8,6 +8,6 @@ import com.saocarlos.saocarlos.model.Medico;
 
 public interface MedicoRepo extends JpaRepository<Medico, Long> {
 
-	Optional<Medico> findByNomeMedicoContainingIgnoreCase(String nome_medico);
+	List<Medico> findByNomeMedicoContainingIgnoreCase(String nome_medico);
 	List<Medico> findByEspecialidadeContainingIgnoreCase(String especialidade);
 }

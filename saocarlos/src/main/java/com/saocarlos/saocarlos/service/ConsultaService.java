@@ -140,7 +140,6 @@ public class ConsultaService {
         return converterParaDTO(atualizada);
     }
 
-
     // ✅ Reagendar consulta (alterar data e hora)
     public ConsultaDTO reagendarConsulta(Long id, Consulta consultaAtualizada) {
         Consulta consulta = consultaRepository.findById(id)
