@@ -259,7 +259,7 @@ PACIENTES (1) ───< CONSULTAS >───(1) MEDICOS
 
 ## 👩‍💻 Equipe
 
-* Anajara 
+* Anajara Lucas
 * Camila Ribeiro
 * Fernanda Bastos
 * Juliana Chang
