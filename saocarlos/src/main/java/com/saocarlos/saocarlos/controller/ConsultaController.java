@@ -13,6 +13,7 @@ import com.saocarlos.saocarlos.service.MedicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.SystemPropertyUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -93,24 +94,47 @@ public class ConsultaController {
     @PutMapping("/editar/{id}")
     public ResponseEntity<?> editarConsulta(@PathVariable ("id") Long id, @RequestBody ConsultaDTO consultaDTO) {
     	try {
-    		
+    		System.out.println("== UPDATE INFO ==");
+    		System.out.println(consultaDTO.getId());
+    		System.out.println(consultaDTO.getDataConsulta());
+    		System.out.println(consultaDTO.getHoraConsulta());
+    		System.out.println(consultaDTO.getStatus());
+    		System.out.println(consultaDTO.getIdPaciente());
+    		System.out.println(consultaDTO.getNomePaciente());
+    		System.out.println(consultaDTO.getIdMedico());
+    		System.out.println(consultaDTO.getNomeMedico());
+    		System.out.println(consultaDTO.getEspecialidade());
 			Optional<Consulta> registro = consultaRepo.findById(id);
 			if (registro.isEmpty())
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Não há consulta com essa ID"));
 			
 			Consulta consultaAtual = registro.get();
+			System.out.println("== CONSULTA ATUAL ==");
+    		System.out.println(consultaAtual.getId());
+    		System.out.println(consultaAtual.getDataConsulta());
+    		System.out.println(consultaAtual.getHoraConsulta());
+    		System.out.println(consultaAtual.getStatus());
+    		System.out.println(consultaAtual.getPaciente().getId());
+    		System.out.println(consultaAtual.getPaciente().getNome());
+    		System.out.println(consultaAtual.getMedico().getId());
+    		System.out.println(consultaAtual.getMedico().getNomeMedico());
+    		System.out.println(consultaAtual.getMedico().getEspecialidade());
+
 			Consulta consultaUpdate = new Consulta();
 			
 			consultaUpdate.setId(id);
 			consultaUpdate.setDataConsulta(consultaDTO.getDataConsulta());
 			consultaUpdate.setHoraConsulta(consultaDTO.getHoraConsulta());
 			consultaUpdate.setStatus(consultaDTO.getStatus());
+
 			
 			if (!consultaDTO.getNomePaciente().equals(consultaAtual.getPaciente().getNome())) {
+				System.out.println("PACIENTES DIFERENTES");
 				Optional<Paciente> registroPaciente = pacienteService.buscarPorNome(consultaDTO.getNomePaciente());
 				if (registroPaciente.isEmpty())
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo paciente não encontrado"));
 				Paciente novoPaciente = registroPaciente.get();
+				System.out.println("PACIENTE NOVO: " + novoPaciente.getNome());
 				consultaUpdate.setPaciente(novoPaciente);
 			}
 			
@@ -119,11 +143,35 @@ public class ConsultaController {
 				if (registroMedico.isEmpty())
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo médico não encontrado"));
 				Medico novoMedico = registroMedico.get();
+				System.out.println("MEDICO NOVO: " + novoMedico.getNomeMedico());
 				consultaUpdate.setMedico(novoMedico);
 			}
 			
-			consultaRepo.save(consultaUpdate);
-			 return ResponseEntity.ok().body("Consulta atualizada com sucesso!");
+			System.out.println("== CONSULTA PARA MANDAR ==");
+			System.out.println(consultaUpdate.getId());
+    		System.out.println(consultaUpdate.getDataConsulta());
+    		System.out.println(consultaUpdate.getHoraConsulta());
+    		System.out.println(consultaUpdate.getStatus());
+    		System.out.println(consultaUpdate.getPaciente().getId());
+    		System.out.println(consultaUpdate.getPaciente().getNome());
+    		System.out.println(consultaUpdate.getMedico().getId());
+    		System.out.println(consultaUpdate.getMedico().getNomeMedico());
+    		System.out.println(consultaUpdate.getMedico().getEspecialidade());
+    		
+			Consulta resultado = consultaRepo.save(consultaUpdate);
+			
+			System.out.println("== RESULTADO ==");
+			System.out.println(resultado.getId());
+    		System.out.println(resultado.getDataConsulta());
+    		System.out.println(resultado.getHoraConsulta());
+    		System.out.println(resultado.getStatus());
+    		System.out.println(resultado.getPaciente().getId());
+    		System.out.println(resultado.getPaciente().getNome());
+    		System.out.println(resultado.getMedico().getId());
+    		System.out.println(resultado.getMedico().getNomeMedico());
+    		System.out.println(resultado.getMedico().getEspecialidade());
+			
+			return ResponseEntity.ok().body(resultado);
 			
 		} catch (IllegalArgumentException err) {
 			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", err.getMessage()));

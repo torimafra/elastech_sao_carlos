@@ -343,7 +343,7 @@ async function atualizarConsulta(id) {
 		           fetch(`http://localhost:8080/pacientes/buscarPaciente/${encodeURIComponent(nomePaciente)}`)
 		       ]);
 			   
-		if (!medicoRes.ok || !pacientesRes.ok) throw new Error('Erro ao atualizar consulta');
+		if (!medicosRes.ok || !pacientesRes.ok) throw new Error('Erro ao atualizar consulta');
 
 		const medico = await medicosRes.json();
 		const paciente = await pacientesRes.json();
@@ -351,7 +351,7 @@ async function atualizarConsulta(id) {
 		const idPaciente = paciente.id;
 		const idMedico = medico.id;
 		const especialidade = medico.especialidade;
-
+		console.log(especialidade);
 	    const consultaAtualizada = { dataConsulta, horaConsulta, status, idPaciente, nomePaciente, idMedico, nomeMedico, especialidade };
 		console.log(consultaAtualizada);
 	    const resposta = await fetch(`${API_BASE}/editar/${id}`, {
@@ -360,7 +360,6 @@ async function atualizarConsulta(id) {
 	        body: JSON.stringify(consultaAtualizada)
 	    });
 
-		console.log("resposta.ok:", resposta.ok, "status:", reposta.status);
 	    if (!resposta.ok) throw new Error('Erro ao atualizar consulta');
 
 		const consultaSalva = await resposta.json();
@@ -373,8 +372,6 @@ async function atualizarConsulta(id) {
 		);
 
 		await listarConsultas();
-
-		setTimeout(() => {limparFormAdicionar();}, 3000);
 
 		} catch (erro) {
 		    mostrarMensagem(resultadoDiv, `❌ Erro ao atualizar consulta`, 'erro');
