@@ -129,13 +129,14 @@ public class ConsultaController {
 
 			
 			if (!consultaDTO.getNomePaciente().equals(consultaAtual.getPaciente().getNome())) {
-				System.out.println("PACIENTES DIFERENTES");
 				Optional<Paciente> registroPaciente = pacienteService.buscarPorNome(consultaDTO.getNomePaciente());
 				if (registroPaciente.isEmpty())
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo paciente não encontrado"));
 				Paciente novoPaciente = registroPaciente.get();
 				System.out.println("PACIENTE NOVO: " + novoPaciente.getNome());
 				consultaUpdate.setPaciente(novoPaciente);
+			} else {
+				consultaUpdate.setPaciente(consultaAtual.getPaciente());
 			}
 			
 			if (!consultaDTO.getNomeMedico().equals(consultaAtual.getMedico().getNomeMedico())) {
@@ -145,6 +146,8 @@ public class ConsultaController {
 				Medico novoMedico = registroMedico.get();
 				System.out.println("MEDICO NOVO: " + novoMedico.getNomeMedico());
 				consultaUpdate.setMedico(novoMedico);
+			} else {
+				consultaUpdate.setMedico(consultaAtual.getMedico());
 			}
 			
 			System.out.println("== CONSULTA PARA MANDAR ==");
