@@ -308,9 +308,11 @@ function renderizarMedicos(medicos) {
 		const actions = row.insertCell();
 		actions.innerHTML = `
 		<div class="action-icons">
-		  <img src="img/edit-icon.png" alt="Editar" class="icon-edit-img" onclick="preencherAtualizarMedico(${m.id})"> 
-		  <img src="img/delete-icon.png" alt="Excluir" class="icon-delete-img" onclick="deletarMedicoPorId(${m.id})"> 
-		</div>
+	    <div class="btn-edit">
+	      <button class="styled-button1" onclick="atualizarConsulta(${id})">Atualizar</button>
+	      <button class="styled-button2" onclick="listarConsultas()">Cancelar</button>
+	    </div>
+	  </div>
 		`;
         row.insertCell().textContent = m.id;
         row.insertCell().textContent = m.nomeMedico;
