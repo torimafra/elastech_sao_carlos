@@ -630,6 +630,50 @@ table {
     border-radius: 10px;
 }
 
+/* Container da célula de ações */
+.btn-edit {
+  display: flex;
+  flex-direction: column;     /* coloca os botões um embaixo do outro */
+  justify-content: center;    /* centraliza verticalmente */
+  align-items: center;        /* centraliza horizontalmente */
+  gap: 6px;                   /* espaço entre Atualizar e Cancelar */
+  height: 100%;               /* mantém a altura fixa da célula */
+  padding: 6px;               /* espaçamento interno */
+  box-sizing: border-box;
+}
+
+/* Botões dentro da célula */
+.btn-edit .styled-button1,
+.btn-edit .styled-button2 {
+  width: 90px;                 
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Cores específicas */
+.btn-edit .styled-button1 {
+  background-color: #e9ec71;  /* amarelo */
+  color: #3a3a00;
+}
+
+.btn-edit .styled-button2 {
+  background-color: #68c0c9;  /* azul */
+  color: white;
+}
+
+/* Efeito hover */
+.btn-edit .styled-button1:hover,
+.btn-edit .styled-button2:hover {
+  transform: scale(1.05);
+  filter: brightness(0.95);
+}
+
+
 /* ------- RODAPÉ (FOOTER) ------- */
 
 footer {
