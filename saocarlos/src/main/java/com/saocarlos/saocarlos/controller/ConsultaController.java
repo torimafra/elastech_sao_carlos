@@ -107,10 +107,10 @@ public class ConsultaController {
 			consultaUpdate.setStatus(consultaDTO.getStatus());
 			
 			if (!consultaDTO.getNomePaciente().equals(consultaAtual.getPaciente().getNome())) {
-				List<Paciente> registroPaciente = pacienteService.buscarPorNome(consultaDTO.getNomePaciente());
+				Optional<Paciente> registroPaciente = pacienteService.buscarPorNome(consultaDTO.getNomePaciente());
 				if (registroPaciente.isEmpty())
 					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo paciente não encontrado"));
-				Paciente novoPaciente = registroPaciente.get(0);
+				Paciente novoPaciente = registroPaciente.get();
 				consultaUpdate.setPaciente(novoPaciente);
 			}
 			

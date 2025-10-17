@@ -26,7 +26,7 @@ public class PacienteController {
 	}
 	
 	@GetMapping("/buscarPaciente/{nome}")
-	public List<Paciente> pacientePorNome(@PathVariable("nome") String nome_paciente) {
+	public Optional<Paciente> pacientePorNome(@PathVariable("nome") String nome_paciente) {
 		return pacienteService.buscarPorNome(nome_paciente);
 	}
 	

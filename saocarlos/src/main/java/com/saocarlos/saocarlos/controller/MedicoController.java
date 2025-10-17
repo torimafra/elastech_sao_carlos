@@ -31,9 +31,18 @@ public class MedicoController {
 	}
 		
 	@GetMapping("/buscarMedico/{nome}")
-	public Medico medicoPorNome(@PathVariable("nome") String nome_medico) {
-		return medicoService.buscarPorNome(nome_medico).orElse(null);
+	public ResponseEntity<?> medicoPorNome(@PathVariable("nome") String nome_medico) {
+		
+		try {
+			
+			Optional<Medico> medico = medicoService.buscarPorNome(nome_medico);
+			return ResponseEntity.status(HttpStatus.OK).body(medico);
+			
+		} catch (IllegalArgumentException err) {
+			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", err.getMessage()));
+		}
 	}
+	
 	
 	@GetMapping("/buscarEspecialidade/{espec}")
 	public List<Medico> medicoPorEspec(@PathVariable("espec") String especialidade) {

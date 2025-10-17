@@ -26,7 +26,7 @@ public class PacienteService {
 		return repository.findById(id);
 	}
 	
-	public List<Paciente> buscarPorNome(String nome) {
+	public Optional<Paciente> buscarPorNome(String nome) {
 	    return repository.findByNomeContainingIgnoreCase(nome);
 	}
 	

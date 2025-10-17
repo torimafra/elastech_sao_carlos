@@ -336,48 +336,49 @@ async function atualizarConsulta(id) {
 	const status = document.getElementById('novoStatus').value;
 	const nomeMedico = document.getElementById('novoMedico').value;
 	const nomePaciente = document.getElementById('novoPaciente').value;
-	
-	try {
-	       const [medicosRes, pacientesRes] = await Promise.all([
-	           fetch('http://localhost:8080/medicos/listarMedicos'),
-	           fetch('http://localhost:8080/pacientes/listarPacientes')
-	       ]);
-	
-	try {
-		const resposta = await fetch(`http://localhost:8080/medicos/buscarMedico/${nomeMedico}`, {
-		    method: 'PUT',
-		    headers: { 'Content-Type': 'application/json' },
-		    body: JSON.stringify(consultaAtualizada)
-		});
-	}
 
 	try {
-	    const consultaAtualizada = { dataConsulta, horaConsulta, status, nomeMedico, nomePaciente };
+		const [medicosRes, pacientesRes] = await Promise.all([
+		           fetch(`http://localhost:8080/medicos/buscarMedico/${encodeURIComponent(nomeMedico)}`),
+		           fetch(`http://localhost:8080/pacientes/buscarPaciente/${encodeURIComponent(nomePaciente)}`)
+		       ]);
+			   
+		if (!medicoRes.ok || !pacientesRes.ok) throw new Error('Erro ao atualizar consulta');
 
+		const medico = await medicosRes.json();
+		const paciente = await pacientesRes.json();
+
+		const idPaciente = paciente.id;
+		const idMedico = medico.id;
+		const especialidade = medico.especialidade;
+
+	    const consultaAtualizada = { dataConsulta, horaConsulta, status, idPaciente, nomePaciente, idMedico, nomeMedico, especialidade };
+		console.log(consultaAtualizada);
 	    const resposta = await fetch(`${API_BASE}/editar/${id}`, {
 	        method: 'PUT',
 	        headers: { 'Content-Type': 'application/json' },
 	        body: JSON.stringify(consultaAtualizada)
 	    });
 
+		console.log("resposta.ok:", resposta.ok, "status:", reposta.status);
 	    if (!resposta.ok) throw new Error('Erro ao atualizar consulta');
 
 		const consultaSalva = await resposta.json();
+		
+		console.log(consultaSalva);
 		       
-		       mostrarMensagem(resultadoDiv, 
-		           `✅ Consulta atualizada com sucesso!`, 
-		           'sucesso'
-		       );
+		mostrarMensagem(resultadoDiv, 
+		     `✅ Consulta atualizada com sucesso!`, 
+		     'sucesso'
+		);
 
-		       await listarConsultas();
+		await listarConsultas();
 
-		       setTimeout(() => {
-		           limparFormAdicionar();
-		       }, 3000);
+		setTimeout(() => {limparFormAdicionar();}, 3000);
 
-		   } catch (erro) {
-		       mostrarMensagem(resultadoDiv, `❌ Erro ao atualizar consulta`, 'erro');
-		   }
+		} catch (erro) {
+		    mostrarMensagem(resultadoDiv, `❌ Erro ao atualizar consulta`, 'erro');
+		}
 
 }
 

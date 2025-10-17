@@ -10,6 +10,6 @@ public interface PacienteRepo extends JpaRepository<Paciente, Long> {
 	
 	boolean existsByCpf(String cpf);
     Optional<Paciente> findByCpf(String cpf);
-    List<Paciente> findByNomeContainingIgnoreCase(String nome);
+    Optional<Paciente> findByNomeContainingIgnoreCase(String nome);
 
 }
