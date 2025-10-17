@@ -208,6 +208,7 @@ body {
     margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 6px;
+	background-color: white;
     transition: border-color 0.3s;
 }
 
@@ -281,16 +282,22 @@ table {
 }
 
 /* Estilos das Linhas do Corpo da Tabela */
-#tabelaMedicos tr {
+#tabelaMedicos tr,
+#tabelaPacientes tr,
+#tabelaConsultas tr {
     cursor: default;
     transition: background-color 0.2s;
 }
 
-#tabelaMedicos tr:hover { 
+#tabelaMedicos tr:hover,
+#tabelaPacientes tr:hover,
+#tabelaConsultas tr:hover { 
     background-color: #f0f0f0; /* Feedback visual ao passar o mouse. */
 }
 
-#tabelaMedicos td {
+#tabelaMedicos td, 
+#tabelaPacientes td,
+#tabelaConsultas td{
     background-color: #f7fcfc;
     border: 1px solid #e0f0f0;
     padding: 10px;
@@ -298,6 +305,7 @@ table {
     text-align: center;
     height: 50px;
 }
+
 
 /* Estilos dos Ícones de Ação (Editar/Deletar) */
 .action-icons-inline {

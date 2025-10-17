@@ -30,6 +30,10 @@ public class PacienteService {
 	    return repository.findByNomeContainingIgnoreCase(nome);
 	}
 	
+	public Optional<Paciente>buscarPorCpf(String cpf) {
+		return repository.findByCpf(cpf);
+	}
+	
 	public List<Paciente> listarTodos(){
 		return repository.findAll();
 	}

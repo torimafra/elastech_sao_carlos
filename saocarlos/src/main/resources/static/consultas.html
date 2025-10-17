@@ -71,30 +71,27 @@
     <div class="table-container">
       <div class="filter-section">
         <h2 class="section-title">Consultas Agendadas</h2>
-        <h2 class="section-title">Médicos</h2>
           <p>Filtrar por:</p>
           <div class="filter-container">
             <select id="tipoFiltro" class="styled-input filter-select">
               <option value="id">ID</option>
-              <option value="nome" selected>Nome</option>
-              <option value="selectFiltroStatus">Status</option>
+              <option value="nome" selected>Nome do Médico</option>
+              <option value="status">Status</option>
             </select>
-            <input type="text" id="filtro" oninput="filtrarConsultas()" placeholder="Digite aqui..." class="styled-input filter-input">
+            <input type="text" id="filtro" oninput="filtrarConsultas()" placeholder="Digite aqui..." class="styled-input">
           </div>
         </div>
 
       <table>
+		<thead>
           <tr>
-            <div class="action-icons">
-                    <img src="img/edit-icon.png" alt="Editar" class="icon-edit-img" onclick="iniciarEdicao()"> 
-                    <img src="img/delete-icon.png" alt="Excluir" class="icon-delete-img" onclick="excluirMedico()"> 
-                  </div>
+			<th class="table-header action-col">AÇÕES</th>
             <th class="table-header id-col">ID</th>
-            <th class="table-header">DATA</th>
-            <th class="table-header">HORA</th>
-            <th class="table-header">MÉDICO</th>
-            <th class="table-header">PACIENTE</th>
-            <th class="table-header">STATUS</th>
+            <th class="table-header data-col">DATA</th>
+            <th class="table-header hora-col">HORA</th>
+            <th class="table-header med-col">MÉDICO</th>
+            <th class="table-header pac-col">PACIENTE</th>
+            <th class="table-header status-col">STATUS</th>
           </tr>
         </thead>
         <tbody id="tabelaConsultas"></tbody>

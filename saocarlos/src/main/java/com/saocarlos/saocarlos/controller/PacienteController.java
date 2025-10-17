@@ -35,6 +35,11 @@ public class PacienteController {
 		return pacienteService.listarTodos();
 	}
 	
+	@GetMapping("/buscarPacienteCpf/{cpf}")
+	public Optional<Paciente> pacientePorCpf(@PathVariable("cpf") String cpf_paciente) {
+		return pacienteService.buscarPorCpf(cpf_paciente);
+	}
+	
 	@PostMapping("/adicionarPaciente")
 	public ResponseEntity<?> cadastrarPaciente(@Valid @RequestBody PacienteInputDTO pacienteInputDTO) {
 		

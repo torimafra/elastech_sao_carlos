@@ -144,35 +144,99 @@ async function carregarSelects() {
 }
 
 // 🔍 FILTRAR CONSULTAS POR MÉDICO OU PACIENTE
+//async function filtrarConsultas() {
+//    const filtro = document.getElementById('inputFiltro').value.toLowerCase();
+//    const resultadoDiv = document.getElementById('resultadoListar');
+//    mostrarLoading(resultadoDiv);
+//
+//    try {
+//        const resposta = await fetch(`${API_BASE}`);
+//		console.log("LINHA 153");
+//        if (!resposta.ok) throw new Error('Erro ao buscar consultas.');
+//
+//        const consultas = await resposta.json();
+//
+//        // Filtra por médico ou paciente
+//        const filtradas = consultas.filter(c =>
+//            c.nome_medico.toLowerCase().includes(filtro) ||
+//            c.nome_paciente.toLowerCase().includes(filtro)
+//        );
+//
+//        if (!filtradas.length) {
+//            mostrarMensagem(resultadoDiv, '⚠️ Nenhuma consulta encontrada com este filtro.', 'info');
+//            return;
+//        }
+//
+//        renderizarTabelaConsultas(filtradas, resultadoDiv);
+//
+//    } catch (erro) {
+//        mostrarMensagem(resultadoDiv, `❌ ${erro.message}`, 'erro');
+//    }
+//}
+
+// Função auxiliar para exibir feedback na tabela
+function exibirMensagemNaTabela(mensagem, colspan = 4) { 
+    const tbody = document.getElementById('tabelaConsultas');
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr><td colspan="${colspan}" style="text-align:center;">${mensagem}</td></tr>
+        `;
+    }
+}
+
 async function filtrarConsultas() {
-    const filtro = document.getElementById('inputFiltro').value.toLowerCase();
-    const resultadoDiv = document.getElementById('resultadoListar');
-    mostrarLoading(resultadoDiv);
+	const tipoFiltro = document.getElementById('tipoFiltro').value;
+    const valorFiltro = document.getElementById('filtro').value.toLowerCase().trim();
+	let filtradas;
+
 
     try {
         const resposta = await fetch(`${API_BASE}`);
-		console.log("LINHA 153");
+
         if (!resposta.ok) throw new Error('Erro ao buscar consultas.');
 
         const consultas = await resposta.json();
-
+		
+		console.log(consultas);
+		console.log(tipoFiltro);
+		console.log(valorFiltro);
+		
+		switch (tipoFiltro) {
+			case 'id':
+				filtradas = consultas.filter(c =>
+					c.id.toString() === valorFiltro);
+				break;
+			case 'nome':
+				filtradas = consultas.filter(c =>
+				    c.nomeMedico.toLowerCase().includes(valorFiltro));
+				break;
+			case 'status':
+				filtradas = consultas.filter(c =>
+					c.status.toLowerCase().includes(valorFiltro));
+		}
+		
+		console.log(filtradas);
         // Filtra por médico ou paciente
-        const filtradas = consultas.filter(c =>
-            c.nome_medico.toLowerCase().includes(filtro) ||
-            c.nome_paciente.toLowerCase().includes(filtro)
-        );
+        //const filtradas = consultas.filter(c =>
+        //    c.nomeMedico.toLowerCase().includes(valorFiltro) ||
+        //    c.nomePaciente.toLowerCase().includes(valorFiltro)
+        //);
 
         if (!filtradas.length) {
-            mostrarMensagem(resultadoDiv, '⚠️ Nenhuma consulta encontrada com este filtro.', 'info');
+			exibirMensagemNaTabela('⚠️ Nenhuma consulta encontrada com este filtro.');
+            //mostrarMensagem(resultadoDiv, '⚠️ Nenhuma consulta encontrada com este filtro.', 'info');
             return;
         }
 
-        renderizarTabelaConsultas(filtradas, resultadoDiv);
+        renderizarConsultas(filtradas);
 
     } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ ${erro.message}`, 'erro');
+		console.error('Erro ao filtrar consultas:', erro);
+		exibirMensagemNaTabela('❌ Erro ao buscar consultas.');
+        //mostrarMensagem(resultadoDiv, `❌ ${erro.message}`, 'erro');
     }
 }
+
 
 // 🕐 Carregar horários disponíveis
 async function carregarHorariosDisponiveis() {
@@ -236,26 +300,42 @@ async function agendarConsulta(event) {
 }
 
 // 🔍 LISTAR TODAS AS CONSULTAS
-async function listarConsultas() {
-    const resultadoDiv = document.getElementById('resultadoListar');
-    mostrarLoading(resultadoDiv);
+//async function listarConsultas() {
+//    const resultadoDiv = document.getElementById('resultadoListar');
+//    mostrarLoading(resultadoDiv);
+//
+//    try {
+//        const resposta = await fetch(`${API_BASE}`);
+//		console.log("LINHA 244");
+//        if (!resposta.ok) throw new Error('Erro ao buscar consultas.');
+//
+//        const consultas = await resposta.json();
+//
+//        if (!consultas.length) {
+//            mostrarMensagem(resultadoDiv, '⚠️ Nenhuma consulta encontrada.', 'info');
+//            return;
+//        }
+//
+//        renderizarPacientes(pacientes);
+//
+//    } catch (erro) {
+//        mostrarMensagem(resultadoDiv, `❌ ${erro.message}`, 'erro');
+//    }
+//}
 
+// CARREGAR CONSULTAS
+let allConsultas = [];
+
+async function listarConsultas() {
+    exibirMensagemNaTabela('⏳ Carregando consultas...');
     try {
         const resposta = await fetch(`${API_BASE}`);
-		console.log("LINHA 244");
-        if (!resposta.ok) throw new Error('Erro ao buscar consultas.');
-
-        const consultas = await resposta.json();
-
-        if (!consultas.length) {
-            mostrarMensagem(resultadoDiv, '⚠️ Nenhuma consulta encontrada.', 'info');
-            return;
-        }
-
-        renderizarPacientes(pacientes);
-
+        if (!resposta.ok) throw new Error('Erro ao carregar consultas');
+        allConsultas = await resposta.json();
+        renderizarConsultas(allConsultas);
     } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ ${erro.message}`, 'erro');
+        console.error(erro);
+        exibirMensagemNaTabela('❌ Erro ao carregar consultas.');
     }
 }
 
@@ -376,51 +456,43 @@ async function listarConsultas(statusFiltro) {
 		
 		console.log(consultas)
         
-        renderizarTabelaConsultas(consultas, resultadoDiv);
+        renderizarConsultas(consultas);
 
     } catch (erro) {
         mostrarMensagem(resultadoDiv, `❌ Erro ao listar consultas: ${erro.message}`, 'erro');
     }
 }
 
-// 🖼️ FUNÇÃO CENTRAL PARA RENDERIZAR A TABELA
-function renderizarTabelaConsultas(consultas, resultadoDiv) {
-    if (!consultas.length) {
-        mostrarMensagem(resultadoDiv, '⚠️ Nenhuma consulta encontrada.', 'info');
+function capitalize(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+}
+
+
+function renderizarConsultas(consultas) {
+    const tbody = document.getElementById('tabelaConsultas');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    if (consultas.length === 0) {
+        exibirMensagemNaTabela('⚠️ Nenhuma consulta encontrada.', 4);
         return;
     }
 
-    let html = `
-        <table class="tabela">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Médico</th>
-                    <th>Paciente</th>
-                    <th>Data</th>
-                    <th>Hora</th>
-                    <th>Ações</th> <-- Adicionado para os botões!
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    consultas.forEach(c => {
-        html += `
-            <tr>
-                <td>${c.id}</td>
-                <td>${c.nomeMedico}</td>
-                <td>${c.nomePaciente}</td>
-                <td>${formatarData(c.dataConsulta)}</td>
-                <td>${c.horaConsulta}</td>
-                <td>
-                    <button onclick="preencherAtualizarConsulta(${c.id})">Editar</button>
-                    <button onclick="deletarConsultaPorId(${c.id})">Excluir</button>
-                </td>
-            </tr>
-        `;
+    consultas.forEach(c => { 
+        const row = tbody.insertRow();
+		const actions = row.insertCell();
+		actions.innerHTML = `
+		<div class="action-icons">
+		  <img src="img/edit-icon.png" alt="Editar" class="icon-edit-img" onclick="preencherAtualizarConsulta(${c.id})"> 
+		  <img src="img/delete-icon.png" alt="Excluir" class="icon-delete-img" onclick="deletarConsultaPorId(${c.id})"> 
+		</div>
+		`;
+        row.insertCell().textContent = c.id;
+        row.insertCell().textContent = c.dataConsulta;
+        row.insertCell().textContent = c.horaConsulta;
+		row.insertCell().textContent = c.nomeMedico;
+		row.insertCell().textContent = c.nomePaciente;
+		row.insertCell().textContent = capitalize(c.status);
     });
-
-    html += '</tbody></table>';
-    resultadoDiv.innerHTML = html;
 }

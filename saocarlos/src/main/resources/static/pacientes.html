@@ -52,8 +52,8 @@
             
             <button type="submit" class="styled-button">Salvar</button>
         </form>
-		<div id="resultadoAdicionar" class="mensagem"></div>
     </div>
+	<div id="resultadoAdicionar" class="mensagem"></div>
     <div class="table-container">
             <div class="filter-section">
             <h2 class="section-title">Pacientes</h2>
@@ -61,11 +61,11 @@
           <div class="filter-container">
             <select id="tipoFiltro" class="styled-input filter-select">
               <option value="nome" selected>Nome do Paciente</option>
-              <option value="CPF">CPF do Paciente</option>
-              <option value="medico">Médico Responsável</option>
-              <option value="especialidade">Especialidade do Atendimento</option>
+              <option value="cpf">CPF do Paciente</option>
+              <!--<option value="medico">Médico Responsável</option>
+              <option value="especialidade">Especialidade do Atendimento</option>-->
             </select>
-            <input type="text" id="filtro" oninput="filtrarPacientes()" placeholder="Digite aqui..." class="styled-input filter-input">
+            <input type="text" id="filtro" oninput="filtrarPacientes()" placeholder="Digite aqui..." class="styled-input">
           </div>
         </div>
         <table>

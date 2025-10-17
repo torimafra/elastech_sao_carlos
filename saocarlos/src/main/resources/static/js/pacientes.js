@@ -316,33 +316,31 @@ function renderizarPacientes(pacientes) {
 
 // 🔍 FILTRAR PACIENTES POR ID, NOME OU CPF (REVISADO)
 async function filtrarPacientes() {
-    const filtro = document.getElementById('inputFiltroPaciente').value.trim().toLowerCase();
-    const tipoFiltro = document.getElementById('tipoFiltroPaciente').value; 
+	const tipoFiltro = document.getElementById('tipoFiltro').value; 
+	const valorFiltro = document.getElementById('filtro').value.toLowerCase().trim();
 
-    if (!filtro) {
+    if (!valorFiltro) {
         await listarPacientes();
         return;
     }
 
-    let endpoint = '';
     exibirMensagemNaTabela('🔍 Buscando pacientes...');
 
+	let endpoint = '';
     switch (tipoFiltro) {
         case 'id':
-            if (isNaN(filtro) || filtro === '') {
+            if (isNaN(valorFiltro) || valorFiltro === '') {
                  exibirMensagemNaTabela('⚠️ O ID deve ser um número válido.');
                  return;
             }
-            endpoint = `${API_BASE}/${filtro}`; 
+            endpoint = `${API_BASE}/${valorFiltro}`; 
             break;
         case 'nome':
-            endpoint = `${API_BASE}/buscarPaciente/${filtro}`;
+            endpoint = `${API_BASE}/buscarPaciente/${valorFiltro}`;
             break;
         case 'cpf':
-            await listarPacientes();
-            const pacientesFiltrados = allPacientes.filter(p => p.cpf && p.cpf.includes(filtro));
-            renderizarPacientes(pacientesFiltrados);
-            return;
+			endpoint = `${API_BASE}/buscarPacienteCpf/${valorFiltro}`;
+           	break;
         default:
             console.error('Tipo de filtro inválido');
             return;
@@ -353,12 +351,8 @@ async function filtrarPacientes() {
         if (!resposta.ok) throw new Error('Erro ao buscar pacientes');
 
         let pacientes = await resposta.json();
-
+		
         if (!Array.isArray(pacientes)) pacientes = pacientes ? [pacientes] : [];
-
-        if (tipoFiltro === 'cpf') {
-            pacientes = pacientes.filter(p => p.cpf && p.cpf.includes(filtro));
-        }
 
         renderizarPacientes(pacientes);
 
