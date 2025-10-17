@@ -327,6 +327,159 @@ table {
     opacity: 0.7; /* Feedback visual ao interagir com o ícone. */
 }
 
+/* MENSAGENS DE FEEDBACK (SUCESSO, ERRO, AVISO)  */
+
+
+
+
+
+
+.mensagem {
+
+
+  display: block;
+
+
+  margin-top: 15px;
+
+
+  padding: 12px 18px;
+
+
+  border-radius: 10px;
+
+
+  font-weight: 600;
+
+
+  text-align: center;
+
+
+  width: 100%;
+
+
+  max-width: 600px;
+
+
+  margin-left: auto;
+
+
+  margin-right: auto;
+
+
+  font-size: 1rem;
+
+
+  background-color: #f7f7f7;
+
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+
+  animation: fadeIn 0.4s ease-in-out;
+
+
+  transition: opacity 0.3s ease, transform 0.3s ease;
+
+
+}
+
+
+
+
+
+/* Animação de entrada suave */
+
+
+@keyframes fadeIn {
+
+
+  from {
+
+
+    opacity: 0;
+
+
+    transform: translateY(-8px);
+
+
+  }
+
+
+  to {
+
+
+    opacity: 1;
+
+
+    transform: translateY(0);
+
+
+  }
+
+
+}
+
+
+
+
+
+/* MENSAGEM DE SUCESSO */
+
+
+.mensagem.sucesso {
+
+
+  background-color: rgba(104, 192, 201, 0.15);
+
+
+  border: 2px solid #68c0c9;
+
+
+  color: #225c60;
+
+
+}
+
+
+
+
+
+/* MENSAGEM DE ERRO */
+
+
+.mensagem.erro {
+
+
+  background-color: rgba(200, 64, 88, 0.15); 
+
+
+  border: 2px solid #c04058;
+
+
+  color: #6b001d;
+
+
+}
+
+
+
+
+
+/* MENSAGEM DE AVISO */
+
+
+.mensagem.aviso {
+
+
+  background-color: rgba(233, 236, 113, 0.25);   border: 2px solid #e9ec71;
+
+
+  color: #6e6b00;
+
+
+}
+
 /* ----------------------------------------------------------- */
 /* PÁGINA INICIAL / HOME                 */
 /* ----------------------------------------------------------- */
