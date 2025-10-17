@@ -245,9 +245,11 @@ async function preencherAtualizarPaciente(id) {
 
 	targetCells[0].innerHTML = `
 	<div class="action-icons">
-			<alt="Atualizar" class="styled-button" onclick="atualizarPaciente(${id})">Atualizar</button>
-			<alt="Cancelar" class="styled-button" onclick="listarPacientes()">Cancelar</button>
-			</div>
+	    <div class="btn-edit">
+	      <button class="styled-button1" onclick="atualizarConsulta(${id})">Atualizar</button>
+	      <button class="styled-button2" onclick="listarConsultas()">Cancelar</button>
+	    </div>
+	  </div>
 	`;
 }
 
