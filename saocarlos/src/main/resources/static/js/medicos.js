@@ -30,6 +30,7 @@ const formularios = {
 
 // 🏠 Funções de Navegação
 function voltarMenu() {
+	console.log("VOLTAR MENU");
     Object.values(formularios).forEach(form => {
         form.classList.remove('ativo');
     });
@@ -47,6 +48,7 @@ function mostrarAdicionar() {
 }
 
 function mostrarAtualizar() {
+	console.log("MOSTRAR ATUALIZAR")
     voltarMenu();
     formularios.atualizar.classList.add('ativo');
 }
@@ -194,21 +196,14 @@ async function adicionarMedico(event) {
 }
 
 // ✏️ ATUALIZAR MÉDICO
-async function atualizarMedico() {
-    const id = document.getElementById('idAtualizar').value;
-    const nome = document.getElementById('nomeAtualizar').value;
-    const especialidade = document.getElementById('especialidadeAtualizar').value;
-    const resultadoDiv = document.getElementById('resultadoAtualizar');
-
-    if (!id || !nome || !especialidade) {
-        mostrarMensagem(resultadoDiv, '❌ Por favor, preencha todos os campos.', 'erro');
-        return;
-    }
-
-    mostrarLoading(resultadoDiv);
+async function atualizarMedico(id) {
+	
+	const resultadoDiv = document.getElementById('resultadoAdicionar');
+	const nomeMedico = document.getElementById('novoNome').value;
+	const especialidade = document.getElementById('novaEspec').value;
 
     try {
-        const medicoAtualizado = { id: parseInt(id), nome, especialidade };
+        const medicoAtualizado = { nomeMedico, especialidade };
 
         const resposta = await fetch(`${API_BASE}/${id}`, {
             method: 'PUT',
@@ -218,47 +213,53 @@ async function atualizarMedico() {
 
         if (!resposta.ok) throw new Error('Erro ao atualizar médico');
 
-        mostrarMensagem(resultadoDiv, 
-            `✅ Médico "${nome}" atualizado com sucesso!`, 
-            'sucesso'
-        );
+		const medicoSalvo = await resposta.json();
+		       
+		       mostrarMensagem(resultadoDiv, 
+		           `✅ Médico "${medicoSalvo.nomeMedico}" cadastrado com sucesso! ID: ${medicoSalvo.id}`, 
+		           'sucesso'
+		       );
 
-        await listarMedicos();
+		       await listarMedicos();
 
-        setTimeout(() => {
-            limparFormAtualizar();
-        }, 3000);
+		       setTimeout(() => {
+		           limparFormAdicionar();
+		       }, 3000);
 
-    } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ Erro ao atualizar médico: ${erro.message}`, 'erro');
-    }
+		   } catch (erro) {
+		       mostrarMensagem(resultadoDiv, `❌ Erro ao cadastrar médico: ${erro.message}`, 'erro');
+		   }
 }
 
 async function preencherAtualizarMedico(id) {
-    mostrarAtualizar();
 
-    const idInput = document.getElementById('idAtualizar');
-    const nomeInput = document.getElementById('nomeAtualizar');
-    const espInput = document.getElementById('especialidadeAtualizar');
-    const resultadoDiv = document.getElementById('resultadoAtualizar');
+    const resultadoDiv = document.getElementById('resultadoAdicionar');
+	const tabela = document.getElementById('tabelaMedicos');
     
-    if (!idInput || !nomeInput || !espInput) return;
+    if (!tabela) return;
+	const linhas = tabela.querySelectorAll('tr');
+	const targetLine = Array.from(linhas).find(linha => linha.cells[1].textContent === id.toString());
+	const targetCells = targetLine.cells;
+	for(i = 2; i < targetCells.length; i++) {
+		const input = document.createElement('input');
+		input.type = 'text';
+		if (i == 2)
+			input.id = 'novoNome';
+		if( i == 3)
+			input.id = 'novaEspec';
+		input.classList.add('styled-input-table');
+		input.placeholder = targetCells[i].textContent;
+		targetCells[i].textContent = '';
+		targetCells[i].appendChild(input);
+	}
+	
 
-    idInput.value = id;
-    mostrarLoading(resultadoDiv);
-
-    try {
-        const resposta = await fetch(`${API_BASE}/${id}`);
-        if (!resposta.ok) throw new Error('Erro ao buscar médico para edição');
-        const medico = await resposta.json();
-
-        nomeInput.value = medico.nome;
-        espInput.value = medico.especialidade;
-
-        resultadoDiv.innerHTML = ''; 
-    } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ Erro ao carregar dados do médico ${id}: ${erro.message}`, 'erro');
-    }
+	targetCells[0].innerHTML = `
+		<div class="action-icons">
+		<alt="Atualizar" class="styled-button" onclick="atualizarMedico(${id})">Atualizar</button>
+		<alt="Cancelar" class="styled-button" onclick="listarMedicos()">Cancelar</button>
+		</div>
+	`;
 }
 
 // 🗑️ DELETAR MÉDICO
@@ -268,7 +269,6 @@ async function deletarMedicoPorId(id) {
     try {
         const resposta = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
         if (!resposta.ok) throw new Error('Erro ao deletar médico');
-
         // Recarrega a lista para remover a linha deletada
         await listarMedicos(); 
     } catch (erro) {

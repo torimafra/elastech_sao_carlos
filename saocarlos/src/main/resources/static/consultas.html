@@ -53,8 +53,7 @@
         </select>
 
         <label for="horaConsulta">Horário:</label>
-        <select id="selectHorario" required class="styled-input">
-          <option value="">Selecione o horário</option>
+        <input type="time" id="selectHorario" required class="styled-input">
         </select>
 
         <label for="pacienteConsulta">Paciente:</label>
@@ -64,9 +63,10 @@
 
         <button type="submit" class="styled-button">Salvar Consulta</button>
       </form>
-	  <div id="resultadoAgendar" class="mensagem"></div>
-	  <div id="resultadoAtualizar" class="mensagem"></div>
     </div>
+
+	<div id="resultadoAgendar" class="mensagem"></div>
+	<div id="resultadoAtualizar" class="mensagem"></div>
 
     <div class="table-container">
       <div class="filter-section">

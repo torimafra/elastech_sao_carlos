@@ -19,7 +19,7 @@ public class Consulta {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataConsulta;
 
-    @Column(name = "hora_consulta", nullable = false)
+    @Column(name = "hora_consulta", nullable = false, columnDefinition = "TIME")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horaConsulta;
 
@@ -68,4 +68,3 @@ public class Consulta {
     public Medico getMedico() { return medico; }
     public void setMedico(Medico medico) { this.medico = medico; }
 }
-

@@ -17,7 +17,6 @@ window.onload = async function () {
     case 'consultas.html':
       await listarConsultas();
 	  await carregarSelects();
-	  await carregarHorariosDisponiveis();
       break;
   }
 };
@@ -73,7 +72,7 @@ function limparFormAgendar() {
     document.getElementById('dataConsulta').value = '';
     document.getElementById('selectMedico').value = '';
     document.getElementById('selectPaciente').value = '';
-    document.getElementById('selectHorario').innerHTML = '<option value="">Selecione o horário</option>';
+    document.getElementById('selectHorario').innerHTML = '';
     document.getElementById('resultadoAgendar').innerHTML = '';
 }
 
@@ -237,27 +236,6 @@ async function filtrarConsultas() {
     }
 }
 
-
-// 🕐 Carregar horários disponíveis
-async function carregarHorariosDisponiveis() {
-    const medicoId = document.getElementById('selectMedico').value;
-    const data = document.getElementById('dataConsulta').value;
-    const selectHorario = document.getElementById('selectHorario');
-
-    if (!medicoId || !data) return;
-
-    try {
-        const response = await fetch(`${API_BASE}/horarios?medicoId=${medicoId}&data=${data}`);
-        if (!response.ok) throw new Error('Erro ao buscar horários.');
-
-        const horarios = await response.json();
-        selectHorario.innerHTML = '<option value="">Selecione o horário</option>';
-        horarios.forEach(h => selectHorario.innerHTML += `<option value="${h}">${h}</option>`);
-    } catch (e) {
-        console.error('Erro ao carregar horários:', e);
-    }
-}
-
 // ➕ AGENDAR CONSULTA
 async function agendarConsulta(event) {
 	
@@ -277,8 +255,18 @@ async function agendarConsulta(event) {
     mostrarLoading(resultadoDiv);
 
     try {
-        const consultaDTO = { data_consulta: data, hora_consulta: hora, id_medico: medico, id_paciente: paciente };
-
+		const consultaDTO = { 
+		    dataConsulta: data, 
+		    horaConsulta: hora, 
+		    status: "AGENDADA", // Use o valor do ENUM em maiúsculas se o Java for sensível
+		    idPaciente: paciente, 
+		    idMedico: medico,
+		    
+		    // CAMPOS ADICIONAIS NECESSÁRIOS PARA O DTO DE JAVA NÃO FALHAR
+		    nomePaciente: "",      // Enviar como string vazia
+		    nomeMedico: "",        // Enviar como string vazia
+		    especialidade: ""      // Enviar como string vazia
+		};
         const resposta = await fetch(`${API_BASE}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -340,76 +328,95 @@ async function listarConsultas() {
 }
 
 // ✏️ ATUALIZAR CONSULTA
-async function atualizarConsulta() {
-    const id = document.getElementById('idConsultaAtualizar').value;
-    const data = document.getElementById('dataConsultaAtualizar').value;
-    const hora = document.getElementById('selectHorarioAtualizar').value;
-    const medico = document.getElementById('selectMedicoAtualizar').value;
-    const paciente = document.getElementById('selectPacienteAtualizar').value;
-    const resultadoDiv = document.getElementById('resultadoAtualizar');
+async function atualizarConsulta(id) {
 
-    if (!id || !data || !hora || !medico || !paciente) {
-        mostrarMensagem(resultadoDiv, '❌ Preencha todos os campos.', 'erro');
-        return;
-    }
+	const resultadoDiv = document.getElementById('resultadoAtualizar');
+	const dataConsulta = document.getElementById('novaData').value;
+	const horaConsulta = document.getElementById('novaHora').value;
+	const status = document.getElementById('novoStatus').value;
+	const nomeMedico = document.getElementById('novoMedico').value;
+	const nomePaciente = document.getElementById('novoPaciente').value;
+	
+	try {
+	       const [medicosRes, pacientesRes] = await Promise.all([
+	           fetch('http://localhost:8080/medicos/listarMedicos'),
+	           fetch('http://localhost:8080/pacientes/listarPacientes')
+	       ]);
+	
+	try {
+		const resposta = await fetch(`http://localhost:8080/medicos/buscarMedico/${nomeMedico}`, {
+		    method: 'PUT',
+		    headers: { 'Content-Type': 'application/json' },
+		    body: JSON.stringify(consultaAtualizada)
+		});
+	}
 
-    mostrarLoading(resultadoDiv);
+	try {
+	    const consultaAtualizada = { dataConsulta, horaConsulta, status, nomeMedico, nomePaciente };
 
-    try {
-        const consultaAtualizada = { data_consulta: data, hora_consulta: hora, id_medico: medico, id_paciente: paciente };
+	    const resposta = await fetch(`${API_BASE}/editar/${id}`, {
+	        method: 'PUT',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify(consultaAtualizada)
+	    });
 
-        const resposta = await fetch(`${API_BASE}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(consultaAtualizada)
-        });
+	    if (!resposta.ok) throw new Error('Erro ao atualizar consulta');
 
-        if (!resposta.ok) throw new Error('Erro ao atualizar consulta.');
+		const consultaSalva = await resposta.json();
+		       
+		       mostrarMensagem(resultadoDiv, 
+		           `✅ Consulta atualizada com sucesso!`, 
+		           'sucesso'
+		       );
 
-        mostrarMensagem(resultadoDiv, `✅ Consulta ${id} atualizada com sucesso!`, 'sucesso');
+		       await listarConsultas();
 
-        await listarConsultas();
+		       setTimeout(() => {
+		           limparFormAdicionar();
+		       }, 3000);
 
-        setTimeout(limparFormAtualizar, 3000);
-    } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ ${erro.message}`, 'erro');
-    }
+		   } catch (erro) {
+		       mostrarMensagem(resultadoDiv, `❌ Erro ao atualizar consulta`, 'erro');
+		   }
+
 }
 
 // ✏️ PREENCHER FORMULÁRIO DE ATUALIZAÇÃO
 async function preencherAtualizarConsulta(id) {
-    mostrarAtualizar();
+	
+	const resultadoDiv = document.getElementById('resultadoAtualizar');
+	const tabela = document.getElementById('tabelaConsultas');
 
-    // Definir elementos do DOM para os campos de atualização aqui
-    const idInput = document.getElementById('idConsultaAtualizar');
-    const resultadoDiv = document.getElementById('resultadoAtualizar');
-    
-    idInput.value = id;
-    mostrarLoading(resultadoDiv);
+	if (!tabela) return;
+	const linhas = tabela.querySelectorAll('tr');
+	const targetLine = Array.from(linhas).find(linha => linha.cells[1].textContent === id.toString());
+	const targetCells = targetLine.cells;
+	for(i = 2; i < targetCells.length; i++) {
+		const input = document.createElement('input');
+		input.type = 'text';
+		if (i == 2)
+			input.id = 'novaData';
+		if( i == 3)
+			input.id = 'novaHora';
+		if (i == 4)
+			input.id = 'novoMedico';
+		if( i == 5)
+			input.id = 'novoPaciente';
+		if (i == 6)
+			input.id = 'novoStatus';
+		input.classList.add('styled-input-table');
+		input.placeholder = targetCells[i].textContent;
+		targetCells[i].textContent = '';
+		targetCells[i].appendChild(input);
+	}
 
-    try {
-        const resposta = await fetch(`${API_BASE}/${id}`);
-        if (!resposta.ok) throw new Error('Consulta não encontrada para edição');
-        const consulta = await resposta.json();
-        
-        // Preenche os campos (após garantir que os selects estão carregados)
-		console.log("LINHA 317");
-        await carregarSelects(); 
-        
-        document.getElementById('selectMedicoAtualizar').value = consulta.id_medico;
-        document.getElementById('selectPacienteAtualizar').value = consulta.id_paciente;
-        
-        // Formato da data pode ser "YYYY-MM-DD" para o input type="date"
-        document.getElementById('dataConsultaAtualizar').value = consulta.data_consulta.split('T')[0];
-        
-        // Carrega os horários para preencher o horário atual
-        await carregarHorariosDisponiveis();
-        document.getElementById('selectHorarioAtualizar').value = consulta.hora_consulta;
 
-        resultadoDiv.innerHTML = ''; 
-    } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ Erro ao carregar dados da consulta ${id}: ${erro.message}`, 'erro');
-    }
+	targetCells[0].innerHTML = `
+		<div class="action-icons">
+		<alt="Atualizar" class="styled-button" onclick="atualizarConsulta(${id})">Atualizar</button>
+		<alt="Cancelar" class="styled-button" onclick="listarConsultas()">Cancelar</button>
+		</div>
+	`;
 }
 
 // 🗑️ DELETAR CONSULTA POR ID (DA TABELA)

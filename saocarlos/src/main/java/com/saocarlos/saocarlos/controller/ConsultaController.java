@@ -2,14 +2,22 @@ package com.saocarlos.saocarlos.controller;
 
 import com.saocarlos.saocarlos.dto.ConsultaDTO;
 import com.saocarlos.saocarlos.model.enums.StatusConsulta;
+import com.saocarlos.saocarlos.repository.ConsultaRepo;
 import com.saocarlos.saocarlos.model.Consulta;
-
+import com.saocarlos.saocarlos.model.Medico;
+import com.saocarlos.saocarlos.model.Paciente;
 import com.saocarlos.saocarlos.service.ConsultaService;
+import com.saocarlos.saocarlos.service.PacienteService;
+import com.saocarlos.saocarlos.service.MedicoService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/consultas")
@@ -18,7 +26,16 @@ public class ConsultaController {
 
     @Autowired
     private ConsultaService consultaService;
- 
+    
+    @Autowired
+    private ConsultaRepo consultaRepo;
+    
+    @Autowired
+    private PacienteService pacienteService;
+    
+    @Autowired
+    private MedicoService medicoService;
+    
     @GetMapping("/{id}")
     public ResponseEntity<?> buscarPorId(@PathVariable Long id) {
     	
@@ -61,21 +78,62 @@ public class ConsultaController {
 
     //  Agendar nova consulta
     @PostMapping
-    public ResponseEntity<?> agendarConsulta(@RequestBody Consulta consulta) {
-    	System.out.println("DATA = " + consulta.getDataConsulta());
-    	System.out.println("HORA = " + consulta.getHoraConsulta());
-    	System.out.println("PACIENTE = " + consulta.getPaciente().getNome());
-    	System.out.println("MEDICO = " + consulta.getMedico().getId());
+    public ResponseEntity<?> agendarConsulta(@RequestBody ConsultaDTO dto) {
+ 
         try {
-            return ResponseEntity.ok(consultaService.agendarConsulta(consulta));
+            ConsultaDTO consultaSalva = consultaService.agendarConsulta(dto); 
+            return ResponseEntity.ok(consultaSalva);
+            
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    
+    // editar todos os campos de consulta
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<?> editarConsulta(@PathVariable ("id") Long id, @RequestBody ConsultaDTO consultaDTO) {
+    	try {
+    		
+			Optional<Consulta> registro = consultaRepo.findById(id);
+			if (registro.isEmpty())
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Não há consulta com essa ID"));
+			
+			Consulta consultaAtual = registro.get();
+			Consulta consultaUpdate = new Consulta();
+			
+			consultaUpdate.setId(id);
+			consultaUpdate.setDataConsulta(consultaDTO.getDataConsulta());
+			consultaUpdate.setHoraConsulta(consultaDTO.getHoraConsulta());
+			consultaUpdate.setStatus(consultaDTO.getStatus());
+			
+			if (!consultaDTO.getNomePaciente().equals(consultaAtual.getPaciente().getNome())) {
+				List<Paciente> registroPaciente = pacienteService.buscarPorNome(consultaDTO.getNomePaciente());
+				if (registroPaciente.isEmpty())
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo paciente não encontrado"));
+				Paciente novoPaciente = registroPaciente.get(0);
+				consultaUpdate.setPaciente(novoPaciente);
+			}
+			
+			if (!consultaDTO.getNomeMedico().equals(consultaAtual.getMedico().getNomeMedico())) {
+				Optional<Medico> registroMedico = medicoService.buscarPorNome(consultaDTO.getNomeMedico());
+				if (registroMedico.isEmpty())
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", "Novo médico não encontrado"));
+				Medico novoMedico = registroMedico.get();
+				consultaUpdate.setMedico(novoMedico);
+			}
+			
+			consultaRepo.save(consultaUpdate);
+			 return ResponseEntity.ok().body("Consulta atualizada com sucesso!");
+			
+		} catch (IllegalArgumentException err) {
+			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("erro", err.getMessage()));
+		}
 
+    }
+    
     // editar data e hora da consulta
     @PutMapping("/{id}")
-    public ResponseEntity<?> reagendarConsulta(@PathVariable Long id, @RequestBody Consulta consultaAtualizada) {
+    public ResponseEntity<?> reagendarConsulta(@PathVariable ("id") Long id, @RequestBody Consulta consultaAtualizada) {
         try {
             return ResponseEntity.ok(consultaService.reagendarConsulta(id, consultaAtualizada));
         } catch (RuntimeException e) {
@@ -86,7 +144,7 @@ public class ConsultaController {
 
     //  Atualizar status (CANCELAR / CONCLUIR)
     @PutMapping("/{id}/status")
-    public ResponseEntity<?> atualizarStatus(@PathVariable Long id, @RequestParam StatusConsulta novoStatus) {
+    public ResponseEntity<?> atualizarStatus(@PathVariable ("id") Long id, @RequestParam StatusConsulta novoStatus) {
         try {
             return ResponseEntity.ok(consultaService.atualizarStatus(id, novoStatus));
         } catch (RuntimeException e) {

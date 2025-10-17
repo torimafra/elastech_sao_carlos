@@ -184,70 +184,71 @@ async function adicionarPaciente(evento) {
 }
 
 // ✏️ ATUALIZAR PACIENTE
-async function atualizarPaciente() {
-    const id = document.getElementById('idAtualizar').value;
-    const nome = document.getElementById('nomeAtualizar').value;
-    const cpf = document.getElementById('cpfAtualizar').value;
-    const resultadoDiv = document.getElementById('resultadoAtualizar');
+async function atualizarPaciente(id) {
 
-    if (!id || !nome || !cpf) {
-        mostrarMensagem(resultadoDiv, '❌ Por favor, preencha todos os campos.', 'erro');
-        return;
-    }
+	const resultadoDiv = document.getElementById('resultadoAdicionar');
+	const nome = document.getElementById('novoNomePaciente').value;
+	const cpf = document.getElementById('novoCpf').value;
 
-    mostrarLoading(resultadoDiv);
-    
+	try {
+	    const pacienteAtualizado = { nome, cpf };
 
-    try {
-        const pacienteAtualizado = { id: parseInt(id), nome, cpf };
+	    const resposta = await fetch(`${API_BASE}/${id}`, {
+	        method: 'PUT',
+	        headers: { 'Content-Type': 'application/json' },
+	        body: JSON.stringify(pacienteAtualizado)
+	    });
 
-        const resposta = await fetch(`${API_BASE}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(pacienteAtualizado)
-        });
+	    if (!resposta.ok) throw new Error('Erro ao atualizar paciente');
 
-        if (!resposta.ok) throw new Error('Erro ao atualizar paciente');
+		const pacienteSalvo = await resposta.json();
+		       
+		       mostrarMensagem(resultadoDiv, 
+		           `✅ Médico "${pacienteSalvo.nomePaciente}" cadastrado com sucesso! ID: ${pacienteSalvo.id}`, 
+		           'sucesso'
+		       );
 
-        mostrarMensagem(resultadoDiv, `✅ Paciente "${nome}" atualizado com sucesso!`, 'sucesso');
+		       await listarPacientes();
 
-        await listarPacientes();
+		       setTimeout(() => {
+		           limparFormAdicionar();
+		       }, 3000);
 
-        setTimeout(() => {
-            limparFormAtualizar();
-        }, 3000);
-
-    } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ Erro ao atualizar paciente: ${erro.message}`, 'erro');
-    }
+		   } catch (erro) {
+		       mostrarMensagem(resultadoDiv, `❌ Erro ao cadastrar paciente: ${erro.message}`, 'erro');
+		   }
 }
 
 // ✅ Função chamada pelo botão 'Editar' na tabela
 async function preencherAtualizarPaciente(id) {
-    mostrarAtualizar();
 
-    const idInput = document.getElementById('idAtualizar');
-    const nomeInput = document.getElementById('nomeAtualizar');
-    const cpfInput = document.getElementById('cpfAtualizar');
-    const resultadoDiv = document.getElementById('resultadoAtualizar');
-    
-    if (!idInput || !nomeInput || !cpfInput) return;
+	const resultadoDiv = document.getElementById('resultadoAdicionar');
+	const tabela = document.getElementById('tabelaPacientes');
 
-    idInput.value = id;
-    mostrarLoading(resultadoDiv);
+	if (!tabela) return;
+	const linhas = tabela.querySelectorAll('tr');
+	const targetLine = Array.from(linhas).find(linha => linha.cells[1].textContent === id.toString());
+	const targetCells = targetLine.cells;
+	for(i = 2; i < targetCells.length; i++) {
+		const input = document.createElement('input');
+		input.type = 'text';
+		if (i == 2)
+			input.id = 'novoNomePaciente';
+		if( i == 3)
+			input.id = 'novoCpf';
+		input.classList.add('styled-input-table');
+		input.placeholder = targetCells[i].textContent;
+		targetCells[i].textContent = '';
+		targetCells[i].appendChild(input);
+	}
 
-    try {
-        const resposta = await fetch(`${API_BASE}/${id}`);
-        if (!resposta.ok) throw new Error('Erro ao buscar paciente para edição');
-        const paciente = await resposta.json();
 
-        nomeInput.value = paciente.nome;
-        cpfInput.value = paciente.cpf;
-
-        resultadoDiv.innerHTML = ''; 
-    } catch (erro) {
-        mostrarMensagem(resultadoDiv, `❌ Erro ao carregar dados do paciente ${id}: ${erro.message}`, 'erro');
-    }
+	targetCells[0].innerHTML = `
+	<div class="action-icons">
+			<alt="Atualizar" class="styled-button" onclick="atualizarPaciente(${id})">Atualizar</button>
+			<alt="Cancelar" class="styled-button" onclick="listarPacientes()">Cancelar</button>
+			</div>
+	`;
 }
 
 // 🗑️ DELETAR PACIENTE
