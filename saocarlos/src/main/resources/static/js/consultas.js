@@ -17,7 +17,6 @@ window.onload = async function () {
     case 'consultas.html':
       await listarConsultas();
 	  await carregarSelects();
-	  await carregarHorariosDisponiveis();
       break;
   }
 };
@@ -73,7 +72,7 @@ function limparFormAgendar() {
     document.getElementById('dataConsulta').value = '';
     document.getElementById('selectMedico').value = '';
     document.getElementById('selectPaciente').value = '';
-    document.getElementById('selectHorario').innerHTML = '<option value="">Selecione o horário</option>';
+    document.getElementById('selectHorario').innerHTML = '';
     document.getElementById('resultadoAgendar').innerHTML = '';
 }
 
@@ -237,27 +236,6 @@ async function filtrarConsultas() {
     }
 }
 
-
-// 🕐 Carregar horários disponíveis
-async function carregarHorariosDisponiveis() {
-    const medicoId = document.getElementById('selectMedico').value;
-    const data = document.getElementById('dataConsulta').value;
-    const selectHorario = document.getElementById('selectHorario');
-
-    if (!medicoId || !data) return;
-
-    try {
-        const response = await fetch(`${API_BASE}/horarios?medicoId=${medicoId}&data=${data}`);
-        if (!response.ok) throw new Error('Erro ao buscar horários.');
-
-        const horarios = await response.json();
-        selectHorario.innerHTML = '<option value="">Selecione o horário</option>';
-        horarios.forEach(h => selectHorario.innerHTML += `<option value="${h}">${h}</option>`);
-    } catch (e) {
-        console.error('Erro ao carregar horários:', e);
-    }
-}
-
 // ➕ AGENDAR CONSULTA
 async function agendarConsulta(event) {
 	
@@ -277,8 +255,18 @@ async function agendarConsulta(event) {
     mostrarLoading(resultadoDiv);
 
     try {
-        const consultaDTO = { data_consulta: data, hora_consulta: hora, id_medico: medico, id_paciente: paciente };
-
+		const consultaDTO = { 
+		    dataConsulta: data, 
+		    horaConsulta: hora, 
+		    status: "AGENDADA", // Use o valor do ENUM em maiúsculas se o Java for sensível
+		    idPaciente: paciente, 
+		    idMedico: medico,
+		    
+		    // CAMPOS ADICIONAIS NECESSÁRIOS PARA O DTO DE JAVA NÃO FALHAR
+		    nomePaciente: "",      // Enviar como string vazia
+		    nomeMedico: "",        // Enviar como string vazia
+		    especialidade: ""      // Enviar como string vazia
+		};
         const resposta = await fetch(`${API_BASE}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -402,8 +390,7 @@ async function preencherAtualizarConsulta(id) {
         // Formato da data pode ser "YYYY-MM-DD" para o input type="date"
         document.getElementById('dataConsultaAtualizar').value = consulta.data_consulta.split('T')[0];
         
-        // Carrega os horários para preencher o horário atual
-        await carregarHorariosDisponiveis();
+        // Preencher o horário atual
         document.getElementById('selectHorarioAtualizar').value = consulta.hora_consulta;
 
         resultadoDiv.innerHTML = ''; 

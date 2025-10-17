@@ -44,6 +44,8 @@ public class ConsultaService {
                 .orElseThrow(() -> new RuntimeException("Consulta não encontrada!"));
     }
     
+ // Supondo que você injetou MedicoRepository e PacienteRepository
+    
     // Listar todas as consultas
     public List<ConsultaDTO> listarTodas() {
         return consultaRepository.findAll()
@@ -88,49 +90,38 @@ public class ConsultaService {
         return consultaRepository.findConsultaExistente(idMedico, data, hora).isEmpty();
     }
 
-    // Agendar consulta
-    public ConsultaDTO agendarConsulta(Consulta consulta) {
+     // Agendar consulta
+    public ConsultaDTO agendarConsulta(ConsultaDTO dto) {
 
-        // 1️⃣ Verifica se o médico existe
-        if (consulta.getMedico() == null || consulta.getMedico().getId() == null) {
-            throw new RuntimeException("Médico não informado!");
-        }
-        if (consulta.getPaciente() == null || consulta.getPaciente().getId() == null) {
-            throw new RuntimeException("Paciente não informado!");
+        if (dto.getIdMedico() == null || dto.getIdPaciente() == null) {
+             throw new RuntimeException("Médico e/ou Paciente não informados!");
         }
 
-
-        Medico medico = medicoRepo.findById(consulta.getMedico().getId())
+        Medico medico = medicoRepo.findById(dto.getIdMedico())
                 .orElseThrow(() -> new RuntimeException("Médico não cadastrado!"));
 
-        // 2️⃣ Verifica se o paciente está cadastrado
-        Paciente paciente;
-        if (consulta.getPaciente() == null || consulta.getPaciente().getId() == null) {
-            throw new RuntimeException("Paciente não cadastrado! É necessário cadastrar o paciente antes de agendar a consulta.");
-        } else {
-            paciente = pacienteRepo.findById(consulta.getPaciente().getId())
-                    .orElseThrow(() -> new RuntimeException("Paciente não encontrado no sistema!"));
-        }
+        Paciente paciente = pacienteRepo.findById(dto.getIdPaciente())
+                .orElseThrow(() -> new RuntimeException("Paciente não encontrado no sistema!"));
 
-        // 3️⃣ Verifica disponibilidade do médico
         boolean disponivel = medicoDisponivel(
-                consulta.getMedico().getId(),
-                consulta.getDataConsulta(),
-                consulta.getHoraConsulta()
+                dto.getIdMedico(),
+                dto.getDataConsulta(),
+                dto.getHoraConsulta()
         );
-
-
 
         if (!disponivel) {
             throw new RuntimeException("Médico já possui consulta neste horário!");
         }
 
-        // 4️⃣ Salva a consulta
-        consulta.setMedico(medico);
-        consulta.setPaciente(paciente);
-        consulta.setStatus(StatusConsulta.AGENDADA);
-
-        Consulta salva = consultaRepository.save(consulta);
+        Consulta novaConsulta = new Consulta();
+        novaConsulta.setDataConsulta(dto.getDataConsulta());
+        novaConsulta.setHoraConsulta(dto.getHoraConsulta());
+        novaConsulta.setStatus(StatusConsulta.AGENDADA);
+        
+        novaConsulta.setMedico(medico);
+        novaConsulta.setPaciente(paciente);
+        
+        Consulta salva = consultaRepository.save(novaConsulta);
         return converterParaDTO(salva);
     }
 

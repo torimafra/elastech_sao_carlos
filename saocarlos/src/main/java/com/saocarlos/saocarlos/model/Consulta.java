@@ -19,7 +19,7 @@ public class Consulta {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dataConsulta;
 
-    @Column(name = "hora_consulta", nullable = false)
+    @Column(name = "hora_consulta", nullable = false, columnDefinition = "TIME")
     @JsonFormat(pattern = "HH:mm")
     private LocalTime horaConsulta;
 

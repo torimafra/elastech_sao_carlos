@@ -61,13 +61,12 @@ public class ConsultaController {
 
     //  Agendar nova consulta
     @PostMapping
-    public ResponseEntity<?> agendarConsulta(@RequestBody Consulta consulta) {
-    	System.out.println("DATA = " + consulta.getDataConsulta());
-    	System.out.println("HORA = " + consulta.getHoraConsulta());
-    	System.out.println("PACIENTE = " + consulta.getPaciente().getNome());
-    	System.out.println("MEDICO = " + consulta.getMedico().getId());
+    public ResponseEntity<?> agendarConsulta(@RequestBody ConsultaDTO dto) {
+ 
         try {
-            return ResponseEntity.ok(consultaService.agendarConsulta(consulta));
+            ConsultaDTO consultaSalva = consultaService.agendarConsulta(dto); 
+            return ResponseEntity.ok(consultaSalva);
+            
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
