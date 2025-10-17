@@ -402,7 +402,7 @@ async function preencherAtualizarConsulta(id) {
 			input.id = 'novoPaciente';
 		if (i == 6)
 			input.id = 'novoStatus';
-		input.classList.add('styled-input-table');
+		input.classList.add('styled-input');
 		input.placeholder = targetCells[i].textContent;
 		targetCells[i].textContent = '';
 		targetCells[i].appendChild(input);
@@ -411,9 +411,11 @@ async function preencherAtualizarConsulta(id) {
 
 	targetCells[0].innerHTML = `
 		<div class="action-icons">
-		<alt="Atualizar" class="styled-button" onclick="atualizarConsulta(${id})">Atualizar</button>
-		<alt="Cancelar" class="styled-button" onclick="listarConsultas()">Cancelar</button>
-		</div>
+	    <div class="btn-edit">
+	      <button class="styled-button1" onclick="atualizarConsulta(${id})">Atualizar</button>
+	      <button class="styled-button2" onclick="listarConsultas()">Cancelar</button>
+	    </div>
+	  </div>
 	`;
 }
 
